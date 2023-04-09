@@ -1,37 +1,83 @@
-const {response} = require('express');
+// const {response, request} = require('express');
+const bcryptjs = require('bcryptjs');
+const User = require('../models/user');
 
-const usersGet = (req, res = response) => {
-    const query = req.query;
+const usersGet = async(req, res) => {
+    const {limit = 5, since = 0} = req.query;
+    const status = {status: true};
 
+    
+    /*
+    // Se mueve a resp
+    const users = await User.find(status)
+        .skip(Number(since))
+        .limit(Number(limit));
+
+    const total = await User.countDocuments(status);
+    */
+
+    const [ total, users ] = await Promise.all([
+        User.countDocuments(status),
+        User.find(status)
+            .skip(Number(since))
+            .limit(Number(limit))
+    ]);
+  
     res.json({
-        message: 'GET API CTRLR',
-        query
+        total,
+        users
     });
 };
 
-const usersPost = (req, res) => {
-    const {name, age} = req.body;
+const usersPost = async (req, res) => {
+    const { name, email, password, role } = req.body;
+    const user = new User({ name, email, password, role });
+
+    /*// Verify is mail exists ** move to helpers
+    const existsEmail = await User.findOne({email});
+
+    if(existsEmail) {
+        return res.status(400).json({
+            error: "Mail already exists"
+        });
+    }*/
+
+    // Encrypt
+    const salt = bcryptjs.genSaltSync();
+    user.password = bcryptjs.hashSync(password,salt);
+
+    // Save
+    await user.save();
 
     res.json({
-        message:'POST API CTRLR',
-        name,
-        age
+        user
     });
 };
 
-const usersPut = (req, res) => {
-    const id = req.params.userId;
+const usersPut = async(req, res) => {
+    const {id} = req.params;
+    const {_id, password, isGoogleUser, email, ...requestBody} = req.body;
 
-    res.json({
-        message:'PUT API CTRLR',
-        id
-    });
+    // TODO Validate vs DB
+    if (password) {
+        const salt = bcryptjs.genSaltSync();
+        requestBody.password = bcryptjs.hashSync(password,salt);
+    }
+
+    const user = await User.findByIdAndUpdate(id, requestBody);
+
+    res.json(user);
 };
 
-const usersDelete = (req, res) => {
-    res.json({
-        message:'DELETE API CTRLR'
-    });
+const usersDelete = async(req, res) => {
+    const {id} = req.params;
+
+    /*// Physical delete
+    const user = await User.findByIdAndDelete(id)*/
+
+    const user = await User.findByIdAndUpdate(id, {status: false});
+
+    res.json(user);
 };
 
 const usersPatch = (req, res) => {
