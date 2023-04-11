@@ -58,7 +58,7 @@ const usersPut = async(req, res) => {
     const {id} = req.params;
     const {_id, password, isGoogleUser, email, ...requestBody} = req.body;
 
-    // TODO Validate vs DB
+    // Validate vs DB
     if (password) {
         const salt = bcryptjs.genSaltSync();
         requestBody.password = bcryptjs.hashSync(password,salt);
@@ -71,11 +71,16 @@ const usersPut = async(req, res) => {
 
 const usersDelete = async(req, res) => {
     const {id} = req.params;
+    // const logged = req.logged;
+
+    // console.log(uid);
 
     /*// Physical delete
     const user = await User.findByIdAndDelete(id)*/
 
-    const user = await User.findByIdAndUpdate(id, {status: false});
+    const user = await User.findByIdAndUpdate(id, {
+            status: false
+        });
 
     res.json(user);
 };
