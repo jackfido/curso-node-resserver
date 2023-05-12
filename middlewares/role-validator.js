@@ -1,7 +1,7 @@
 const { response } = require("express");
 
 const isAdmin = (req, res = response, next) => {
-    console.log(req.logged);
+    // console.log(req.logged);
     if (!req.logged) {
         return res.status(500).json({
             error: 'Permission denied - No token'

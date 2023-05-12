@@ -49,7 +49,7 @@ const usersPost = async (req, res) => {
     // Save
     await user.save();
 
-    res.json({
+    res.status(201).json({
         user
     });
 };
@@ -85,17 +85,17 @@ const usersDelete = async(req, res) => {
     res.json(user);
 };
 
-const usersPatch = (req, res) => {
+/*const usersPatch = (req, res) => {
     res.json({
         message:'PATCH API CTRLR'
     });
-};
+};*/
 
 
 module.exports = {
     usersGet,
     usersPost,
     usersPut,
-    usersDelete,
-    usersPatch
+    usersDelete
+    // usersPatch
 }

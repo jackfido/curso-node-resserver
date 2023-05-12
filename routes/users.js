@@ -1,13 +1,13 @@
 const {Router} = require('express');
 const {check} = require('express-validator');
-const router = Router();
-const {usersGet, usersPut, usersPost, usersDelete, usersPatch} = require('../controllers/users');
+const {usersGet, usersPut, usersPost, usersDelete} = require('../controllers/users');
 /*const {fieldValidator} = require('../middlewares/field-validator');
 const { validateJWT } = require('../middlewares/validate-jwt');
 const { isAdmin, allowedRoles } = require('../middlewares/role-validator');*/
-const {fieldValidator, validateJWT, isAdmin, allowedRoles} = require('../middlewares')
+const {fieldValidator, validateJWT/*, isAdmin*/, allowedRoles} = require('../middlewares')
 const { isValidRole, existsEmail, existsUserById } = require('../helpers/db-validators');
 
+const router = Router();
 router.get('/', usersGet);
 
 router.post('/', [
@@ -39,6 +39,6 @@ router.delete('/:id', [
 ],
 usersDelete);
 
-router.patch('/', usersPatch);
+// router.patch('/', usersPatch);
 
 module.exports = router;

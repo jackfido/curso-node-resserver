@@ -1,5 +1,7 @@
 const Role = require('../models/role');
 const User = require('../models/user')
+const Category = require('../models/category');
+const { Product } = require('../models');
 
 const isValidRole = async(role = '') => {
     const existsRole = await Role.findOne({role});
@@ -25,8 +27,60 @@ const existsUserById = async(id) => {
     }
 };
 
+const existsCategoryByName = async(name) => {
+    name = name.toUpperCase();
+
+    const categoryExists = await Category.findOne({name});
+
+    if(categoryExists) {
+        throw new Error(`Name: ${name} already exists`)
+    }
+};
+
+const existsCategoryById = async(id) => {
+    const categoryExists = await Category.findById(id);
+
+    if(!categoryExists) {
+        throw new Error(`id: ${id} does not exists`)
+    }
+
+    if (categoryExists.status === false) {
+        throw new Error(`id: ${id} inactive`)
+    }
+};
+
+const existsProductByName = async(name) => {
+    if (name === undefined) {
+        return;
+    }
+
+    name = name.toUpperCase();
+
+    const productExists = await Product.findOne({name});
+    
+    if(productExists) {
+        throw new Error(`Name: ${name} already exists`)
+    }
+};
+
+const existsProductById = async(id) => {
+    const productExists = await Product.findById(id);
+
+    if(!productExists) {
+        throw new Error(`id: ${id} does not exists`)
+    }
+
+    if (productExists.status === false) {
+        throw new Error(`id: ${id} inactive`)
+    }
+};
+
 module.exports = {
     isValidRole,
     existsEmail,
-    existsUserById
+    existsUserById,
+    existsCategoryById,
+    existsCategoryByName,
+    existsProductById,
+    existsProductByName
 }
