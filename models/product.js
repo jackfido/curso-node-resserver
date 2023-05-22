@@ -8,6 +8,9 @@ const ProductsSchema = Schema({
     description: {
         type: String
     },
+    img:  {
+        type: String
+    },
     available: {
         type: Boolean,
         default: true
