@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const { dbConnection } = require('../database/config');
 const fileUpload = require('express-fileupload');
+const {socketController, /* socketControllerConnection, socketControllerDisconnection */} = require('../sockets/controller');
 
 class Server{
     constructor() {
@@ -9,6 +10,8 @@ class Server{
         this.port = process.env.PORT;
         // this.userRoutesPath = '/api/users';
         // this.authPath = '/api/auth';
+        this.server = require('http').createServer(this.app);
+        this.io = require('socket.io')(this.server);
         this.paths = {
             auth: '/api/auth',
             categories: '/api/categories',
@@ -24,6 +27,8 @@ class Server{
         this.midlewares();
         //Rutas de mi aplicacion
         this.routes();
+        // Sockets
+        this.sockets();
     }
 
     routes() {
@@ -37,8 +42,15 @@ class Server{
         this.app.use(this.paths.uploads, require('../routes/uploads'));
     }
 
+    sockets() {
+        // console.log(socketController);
+        this.io.on('connection', socket => socketController(socket, this.io));
+        // this.io.on('connection', socket => socketControllerConnection(socket, this.io));
+        // this.io.on('disconnection', socket => socketControllerDisconnection(socket, this.io));
+    }
+
     listen() {
-        this.app.listen(this.port, () => {
+        this.server.listen(this.port, () => {
             console.log('Server running on port: ', this.port);
         });
     }
